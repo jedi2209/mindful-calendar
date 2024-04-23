@@ -23,8 +23,8 @@ import {get} from 'lodash';
 
 import {getTeachers, getAppointmentTypes, getEventsSecond} from './Events';
 
-import './App.css';
-import { useWindowDimensions, checkObjectKey } from './utils';
+import './css/App.css';
+import { useWindowDimensions, checkObjectKey } from './core/utils';
 
 moment.tz.setDefault('Europe/Madrid')
 moment.locale('en-GB', {
@@ -210,48 +210,50 @@ const App = props => {
   }, [events]);
 
   if (!get(events, 'length')) {
-    return <div className='loader'><CircularProgress style={{margin: 'auto'}}/></div>;
+    return <div className='loader' data-testid='loader'><CircularProgress style={{margin: 'auto'}}/></div>;
   }
 
   return (
-    <Paper>
-      <Scheduler data={events} locale={'en-GB'} firstDayOfWeek={1}>
-        <ViewState currentDate={currentDate} onCurrentDateChange={setCurrentDate} />
-        <GroupingState
-          grouping={grouping}
-          groupOrientation={() => 'Vertical'}
-          groupedByDate={true}
-        />
-        {!isMobile ? (
-          <WeekView
+    <div data-testid="scheduler-component">
+      <Paper>
+        <Scheduler data={events} locale={'en-GB'} firstDayOfWeek={1}>
+          <ViewState currentDate={currentDate} onCurrentDateChange={setCurrentDate} />
+          <GroupingState
+            grouping={grouping}
+            groupOrientation={() => 'Vertical'}
+            groupedByDate={true}
+          />
+          {!isMobile ? (
+            <WeekView
+              startDayHour={9}
+              endDayHour={21}
+              cellDuration={60}
+              timeScaleLabelComponent={TimeScaleLabel}
+              name="Week"
+              timeTableCellComponent={weekTimeTableCellComponent}
+            />
+          ) : null}
+          <DayView
             startDayHour={9}
+            dayScaleCellComponent={DayScaleCell}
             endDayHour={21}
             cellDuration={60}
-            timeScaleLabelComponent={TimeScaleLabel}
-            name="Week"
-            timeTableCellComponent={weekTimeTableCellComponent}
+            dayScaleRowComponent={dayScaleRowComponent}
+            timeTableCellComponent={dayTimeTableCellComponent}
           />
-        ) : null}
-        <DayView
-          startDayHour={9}
-          dayScaleCellComponent={DayScaleCell}
-          endDayHour={21}
-          cellDuration={60}
-          dayScaleRowComponent={dayScaleRowComponent}
-          timeTableCellComponent={dayTimeTableCellComponent}
-        />
-        <Appointments appointmentComponent={appointmentComponent} />
-        <Resources
-          data={resources}
-          mainResourceName="appointmentType"
-        />
-        <AppointmentTooltip showCloseButton />
-        <AppointmentForm readOnly={true} />
+          <Appointments appointmentComponent={appointmentComponent} />
+          <Resources
+            data={resources}
+            mainResourceName="appointmentType"
+          />
+          <AppointmentTooltip showCloseButton />
+          <AppointmentForm readOnly={true} />
 
-        <Toolbar />
-        {!isMobile ? (<ViewSwitcher />) : null}
-      </Scheduler>
-    </Paper>
+          <Toolbar />
+          {!isMobile ? (<ViewSwitcher />) : null}
+        </Scheduler>
+      </Paper>
+    </div>
   );
 };
 

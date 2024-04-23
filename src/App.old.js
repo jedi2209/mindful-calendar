@@ -10,7 +10,7 @@ import moment from 'moment';
 import 'moment-timezone';
 import {get} from 'lodash';
 import {getEvents} from './Events';
-import {colors, teachers} from './const';
+import {colors, teachers} from './core/const';
 
 moment.tz.setDefault('Europe/Madrid')
 moment.locale('en-GB', {
