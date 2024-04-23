@@ -1,8 +1,23 @@
 import {get} from 'lodash';
 import moment from 'moment';
 
-import {colors} from './const';
+import {colors} from './core/const';
 
+/**
+ * Object containing links to teacher timetables.
+ * @type {Object.<number, string>}
+ */
+const teacherLinks = {
+  8874199: 'https://mindful-studio.com/timetable/anna',
+  9175210: 'https://mindful-studio.com/timetable/sara',
+  9684621: 'https://mindful-studio.com/timetable/olgastas-belovidov',
+};
+
+/**
+ * Makes an API call to the specified URL.
+ * @param {string} url - The URL to make the API call to.
+ * @returns {Promise<Object>} - A promise that resolves to the JSON response from the API call.
+ */
 const apiCall = async (url) => {
   // const host = 'XXXX';
   const host = 'https://api.mindful-studio.com/v1'
@@ -18,6 +33,10 @@ const apiCall = async (url) => {
   .catch(error => console.error(error));
 };
 
+/**
+ * Retrieves events from the API and transforms them into a standardized format.
+ * @returns {Array} An array of events.
+ */
 const getEvents = async() => {
   const classes = await apiCall('/availability/classes');
   if (get(classes, 'length') > 0) {
@@ -40,12 +59,10 @@ const getEvents = async() => {
   }
 }
 
-const teachers = {
-  8874199: 'https://mindful-studio.com/timetable/anna',
-  9175210: 'https://mindful-studio.com/timetable/sara',
-  9684621: 'https://mindful-studio.com/timetable/olgastas-belovidov',
-};
-
+/**
+ * Retrieves the list of teachers from the API.
+ * @returns {Promise<Array>} The list of teachers.
+ */
 const getTeachers = async () => {
   const calendars = await apiCall('/calendars');
   console.info('calendars', calendars);
@@ -57,7 +74,7 @@ const getTeachers = async () => {
         name: get(el, 'name'),
         text: get(el, 'name'),
         img: get(el, 'image'),
-        link: teachers[get(el, 'id')],
+        link: teacherLinks[get(el, 'id')],
         color: colors[get(el, 'id')],
       });
     });
@@ -65,6 +82,10 @@ const getTeachers = async () => {
   }
 }
 
+/**
+ * Retrieves the appointment types from the API.
+ * @returns {Promise<Array<Object>>} The array of appointment types.
+ */
 const getAppointmentTypes = async () => {
   const types = await apiCall('/appointment-types');
   if (get(types, 'length') > 0) {
@@ -81,6 +102,10 @@ const getAppointmentTypes = async () => {
   }
 }
 
+/**
+ * Retrieves events from the API and transforms them into a standardized format.
+ * @returns {Array} An array of events in the standardized format.
+ */
 const getEventsSecond = async () => {
   const classes = await apiCall('/availability/classes');
   if (get(classes, 'length') > 0) {
@@ -88,10 +113,10 @@ const getEventsSecond = async () => {
     let tmp = {};
     classes.map((el, indx) => {
       const date = moment(get(el, 'time'));
-      let dayTime = 2;
-      if (date.hour() < 14) {
-        dayTime = 1;
-      }
+      // let dayTime = 2;
+      // if (date.hour() < 14) {
+      //   dayTime = 1;
+      // }
       tmp[get(el, 'appointmentTypeID')] = el;
       eventsTmp.push({
         id: indx,
