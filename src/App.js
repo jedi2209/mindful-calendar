@@ -8,6 +8,8 @@ import {
 import {
   Scheduler,
   Resources,
+  DateNavigator,
+  TodayButton,
   DayView,
   WeekView,
   Appointments,
@@ -250,6 +252,8 @@ const App = props => {
           <AppointmentForm readOnly={true} />
 
           <Toolbar />
+          <DateNavigator />
+          <TodayButton />
           {!isMobile ? (<ViewSwitcher />) : null}
         </Scheduler>
       </Paper>
