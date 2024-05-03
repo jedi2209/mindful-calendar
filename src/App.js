@@ -1,6 +1,10 @@
 import React, {cloneElement, useEffect, useState} from 'react';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import Info from '@mui/icons-material/Info';
 import CircularProgress from '@mui/material/CircularProgress';
 import {
   ViewState, GroupingState,
@@ -47,8 +51,17 @@ const grouping = [{
   resourceName: 'appointmentType',
 }];
 
+const PREFIX = 'mindful';
+
 const classes = {
-  dayScaleCell: `mindful-dayScaleCell`,
+  dayScaleCell: `${PREFIX}-dayScaleCell`,
+  icon: `${PREFIX}-icon`,
+  textCenter: `${PREFIX}-textCenter`,
+  firstRoom: `${PREFIX}-firstRoom`,
+  secondRoom: `${PREFIX}-secondRoom`,
+  thirdRoom: `${PREFIX}-thirdRoom`,
+  header: `${PREFIX}-header`,
+  commandButton: `${PREFIX}-commandButton`,
 };
 const StyledWeekViewDayScaleCell = styled(WeekView.DayScaleCell)({
   [`&.${classes.dayScaleCell}`]: {
@@ -94,6 +107,85 @@ const dayTimeTableCellComponent = props => {
   );
 }
 
+const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => ({
+  [`&.${classes.header}`]: {
+    height: '260px',
+  },
+}));
+
+const StyledAppointmentTooltipCommandButton = styled(AppointmentTooltip.CommandButton)(() => ({
+  [`&.${classes.commandButton}`]: {
+    backgroundColor: 'rgba(255,255,255,0.65)',
+  },
+}));
+
+const StyledGrid = styled(Grid)(() => ({
+  [`&.${classes.textCenter}`]: {
+    textAlign: 'center',
+  },
+}));
+
+const StyledInfo = styled(Info)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
+
+const Header = (({
+  children, appointmentData, ...restProps
+}) => {
+  const img = get(appointmentData, 'appointmentData.img');
+  return (
+  <StyledAppointmentTooltipHeader
+    {...restProps}
+    className={classes.header}
+    style={img ? {
+      background: `url(${img}) 50% 50% / cover no-repeat`,
+    } : null}
+    appointmentData={appointmentData}>
+  </StyledAppointmentTooltipHeader>
+)});
+
+const Content = (({
+  children, appointmentData, ...restProps
+}) => {
+  const descriptionData = get(appointmentData, 'originalData.description', '').split("\r\n");
+  return (
+    <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
+      <Grid container alignItems="center">
+        <Grid item xs={2} />
+        <Grid item xs={10}>
+          <a href={get(appointmentData, 'appointmentData.link')} target='_blank'>
+            <Button
+              component="label"
+              size="large"
+              role={undefined}
+              variant="contained"
+              startIcon={<ShoppingBasketIcon />}>
+              Sign UP
+            </Button>
+          </a>
+        </Grid>
+      </Grid>
+      <Grid container alignItems="center">
+        <StyledGrid item xs={2} className={classes.textCenter}>
+          <StyledInfo className={classes.icon} />
+        </StyledGrid>
+        <Grid item xs={10}>
+          {descriptionData.map(el => <p>{el}</p>)}
+        </Grid>
+      </Grid>
+    </AppointmentTooltip.Content>
+  )
+});
+
+const CommandButton = (({
+  ...restProps
+}) => (
+  <StyledAppointmentTooltipCommandButton {...restProps} className={classes.commandButton} />
+));
+
 const App = props => {
   const [events, setEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(today.toDate());
@@ -111,16 +203,17 @@ const App = props => {
   }
 
   const eventsLoading = async() => {
-    const events = await getEventsSecond();
+    let events = await getEventsSecond();
     const teachersInited = checkObjectKey(resources, 'teachers');
     const appointmentTypesInited = checkObjectKey(resources, 'appointmentType');
+    let appointmentTypesTmp = null;
     
     if (!get(appointmentTypesInited, 'length')) {
-      const appointmentTypes = await getAppointmentTypes();
+      appointmentTypesTmp = await getAppointmentTypes();
       resources.push({
         fieldName: 'appointmentType',
         title: 'Appointment Type',
-        instances: appointmentTypes,
+        instances: appointmentTypesTmp,
         allowMultiple: false,
       });
     }
@@ -134,7 +227,13 @@ const App = props => {
       });
     }
     const nearestDateNext = moment(get(events, '0.startDate')).isAfter(moment(), 'days');
-    setEvents(events);
+    if (events && appointmentTypesTmp) {
+      events.map((el, indx) => {
+        const appointmentDataTmp = appointmentTypesTmp.find(es => es.id === el.appointmentType);
+        events[indx].appointmentData = appointmentDataTmp;
+      });
+      setEvents(events);
+    }
     if (nearestDateNext) {
       setCurrentDate(moment(get(events, '0.startDate')).toDate());
     }
@@ -247,7 +346,12 @@ const App = props => {
             data={resources}
             mainResourceName="appointmentType"
           />
-          <AppointmentTooltip showCloseButton />
+          <AppointmentTooltip
+            headerComponent={Header}
+            contentComponent={Content}
+            commandButtonComponent={CommandButton}
+            showCloseButton
+          />
           <AppointmentForm readOnly={true} />
 
           <Toolbar />

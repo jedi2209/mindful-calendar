@@ -94,6 +94,8 @@ const getAppointmentTypes = async () => {
         name: get(el, 'name'),
         text: get(el, 'name'),
         color: get(el, 'color'),
+        img: get(el, 'image'),
+        link: get(el, 'schedulingUrl'),
       });
     });
     return typesTmp;
@@ -108,20 +110,20 @@ const getEventsSecond = async () => {
   const classes = await apiCall('/availability/classes');
   if (get(classes, 'length') > 0) {
     let eventsTmp = [];
-    let tmp = {};
+    // let tmp = {};
     classes.map((el, indx) => {
       const date = moment(get(el, 'time'));
       // let dayTime = 2;
       // if (date.hour() < 14) {
       //   dayTime = 1;
       // }
-      tmp[get(el, 'appointmentTypeID')] = el;
+      // tmp[get(el, 'appointmentTypeID')] = el;
       eventsTmp.push({
         id: indx,
         title: get(el, 'name'),
         startDate: date.toDate(),
         endDate: date.add(get(el, 'duration', 60), 'minutes').toDate(),
-        location: 'Main',
+        location: 'Main Room',
         // dayTime,
         appointmentType: get(el, 'appointmentTypeID'),
         teachers: [get(el, 'calendarID')],
