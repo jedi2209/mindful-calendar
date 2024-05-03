@@ -27,7 +27,6 @@ const apiCall = async (url) => {
   })
   .then(async response => {
     const json = await response.json();
-    console.info('response local', json);
     return json;
   })
   .catch(error => console.error(error));
@@ -65,7 +64,6 @@ const getEvents = async() => {
  */
 const getTeachers = async () => {
   const calendars = await apiCall('/calendars');
-  console.info('calendars', calendars);
   if (get(calendars, 'length') > 0) {
     let calendarsTmp = [];
     calendars.map(el => {
