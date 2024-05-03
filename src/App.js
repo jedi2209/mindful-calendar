@@ -134,7 +134,6 @@ const App = props => {
       });
     }
     const nearestDateNext = moment(get(events, '0.startDate')).isAfter(moment(), 'days');
-    console.info('nearestDateNext', nearestDateNext);
     setEvents(events);
     if (nearestDateNext) {
       setCurrentDate(moment(get(events, '0.startDate')).toDate());
