@@ -327,7 +327,7 @@ const App = props => {
             <WeekView
               startDayHour={9}
               endDayHour={21}
-              cellDuration={60}
+              cellDuration={30}
               timeScaleLabelComponent={TimeScaleLabel}
               name="Week"
               timeTableCellComponent={weekTimeTableCellComponent}
@@ -337,7 +337,7 @@ const App = props => {
             startDayHour={9}
             dayScaleCellComponent={DayScaleCell}
             endDayHour={21}
-            cellDuration={60}
+            cellDuration={30}
             dayScaleRowComponent={dayScaleRowComponent}
             timeTableCellComponent={dayTimeTableCellComponent}
           />
