@@ -156,7 +156,7 @@ const Content = (({
       <Grid container alignItems="center">
         <Grid item xs={2} />
         <Grid item xs={10}>
-          <a href={get(appointmentData, 'appointmentData.link')} target='_blank'>
+          <a href={get(appointmentData, 'appointmentData.link')} target='_blank' rel='noreferrer'>
             <Button
               component="label"
               size="large"
