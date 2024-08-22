@@ -191,6 +191,8 @@ const App = props => {
   const [currentDate, setCurrentDate] = useState(today.toDate());
   const {width} = useWindowDimensions();
   const [isMobile, setIsMobile] = useState(false);
+  const [startHour, setStartHour] = useState(9);
+  const [lastHour, setLastHour] = useState(21);
 
   if (width <= 800) {
     if (!isMobile) {
@@ -228,10 +230,25 @@ const App = props => {
     }
     const nearestDateNext = moment(get(events, '0.startDate')).isAfter(moment(), 'days');
     if (events && appointmentTypesTmp) {
+      let hourFirst = startHour;
+      let hourLast = lastHour;
       events.map((el, indx) => {
+        const eventStartHour = parseInt(moment(el.startDate).format('H'));
+        if (eventStartHour < hourFirst) {
+          hourFirst = eventStartHour;
+        }
+        if (eventStartHour > hourLast) {
+          hourLast = eventStartHour;
+        }
         const appointmentDataTmp = appointmentTypesTmp.find(es => es.id === el.appointmentType);
         events[indx].appointmentData = appointmentDataTmp;
       });
+      if (hourFirst !== startHour) {
+        setStartHour(hourFirst);
+      }
+      if (hourLast !== lastHour) {
+        setLastHour(hourLast);
+      }
       setEvents(events);
     }
     if (nearestDateNext) {
@@ -325,8 +342,8 @@ const App = props => {
           />
           {!isMobile ? (
             <WeekView
-              startDayHour={9}
-              endDayHour={21}
+              startDayHour={startHour}
+              endDayHour={lastHour}
               cellDuration={30}
               timeScaleLabelComponent={TimeScaleLabel}
               name="Week"
@@ -334,9 +351,9 @@ const App = props => {
             />
           ) : null}
           <DayView
-            startDayHour={9}
+            startDayHour={startHour}
             dayScaleCellComponent={DayScaleCell}
-            endDayHour={21}
+            endDayHour={lastHour}
             cellDuration={30}
             dayScaleRowComponent={dayScaleRowComponent}
             timeTableCellComponent={dayTimeTableCellComponent}
