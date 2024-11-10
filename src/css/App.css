@@ -11,6 +11,13 @@
   align-items: center;
 }
 
+.loadingText {
+  position: absolute;
+  width: 100%;
+  top: 60px;
+  text-align: center;
+}
+
 .mindful-dayScaleCell {
   cursor: pointer;
 }

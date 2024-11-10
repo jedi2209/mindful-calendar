@@ -27,7 +27,7 @@ import moment from 'moment';
 import 'moment-timezone';
 import {get} from 'lodash';
 
-import {getTeachers, getAppointmentTypes, getEventsSecond} from './Events';
+import {getTeachers, getAppointmentTypes, getEvents} from './Events';
 
 import './css/App.css';
 import { useWindowDimensions, checkObjectKey } from './core/utils';
@@ -193,6 +193,7 @@ const App = props => {
   const [isMobile, setIsMobile] = useState(false);
   const [startHour, setStartHour] = useState(9);
   const [lastHour, setLastHour] = useState(21);
+  const [loadingText, setLoadingText] = useState(null);
 
   if (width <= 800) {
     if (!isMobile) {
@@ -204,13 +205,15 @@ const App = props => {
     }
   }
 
-  const eventsLoading = async() => {
-    let events = await getEventsSecond();
+  const eventsLoading = async () => {
+    setLoadingText('loading events...');
+    let events = await getEvents();
     const teachersInited = checkObjectKey(resources, 'teachers');
     const appointmentTypesInited = checkObjectKey(resources, 'appointmentType');
     let appointmentTypesTmp = null;
     
     if (!get(appointmentTypesInited, 'length')) {
+      setLoadingText('loading appointments...');
       appointmentTypesTmp = await getAppointmentTypes();
       resources.push({
         fieldName: 'appointmentType',
@@ -220,6 +223,7 @@ const App = props => {
       });
     }
     if (!get(teachersInited, 'length')) {
+      setLoadingText('loading teachers...');
       const teachers = await getTeachers();
       resources.push({
         fieldName: 'teachers',
@@ -250,6 +254,7 @@ const App = props => {
         setLastHour(hourLast);
       }
       setEvents(events);
+      setLoadingText(null);
     }
     if (nearestDateNext) {
       setCurrentDate(moment(get(events, '0.startDate')).toDate());
@@ -327,7 +332,10 @@ const App = props => {
   }, [events]);
 
   if (!get(events, 'length')) {
-    return <div className='loader' data-testid='loader'><CircularProgress style={{margin: 'auto'}}/></div>;
+    return <div className='loader' data-testid='loader'>
+        <CircularProgress style={{ margin: 'auto' }} />
+        {loadingText ? <div className='loadingText'><span>{loadingText}</span></div> : null}
+      </div>;
   }
 
   return (

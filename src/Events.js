@@ -1,5 +1,7 @@
 import {get} from 'lodash';
 import moment from 'moment';
+import {apiCall} from './core/api';
+import {getCache, setCache} from './core/cache';
 
 import {colors} from './core/const';
 
@@ -14,29 +16,10 @@ const teacherLinks = {
 };
 
 /**
- * Makes an API call to the specified URL.
- * @param {string} url - The URL to make the API call to.
- * @returns {Promise<Object>} - A promise that resolves to the JSON response from the API call.
- */
-const apiCall = async (url) => {
-  // const host = 'XXXX';
-  const host = 'https://XXXX'
-  return fetch(host + url, {
-    method: 'GET',
-    redirect: 'follow',
-  })
-  .then(async response => {
-    const json = await response.json();
-    return json;
-  })
-  .catch(error => console.error(error));
-};
-
-/**
  * Retrieves events from the API and transforms them into a standardized format.
  * @returns {Array} An array of events.
  */
-const getEvents = async() => {
+const getEventsOld = async() => {
   const classes = await apiCall('/availability/classes');
   if (get(classes, 'length') > 0) {
     let eventsTmp = [];
@@ -63,7 +46,14 @@ const getEvents = async() => {
  * @returns {Promise<Array>} The list of teachers.
  */
 const getTeachers = async () => {
+  const CACHE_KEY = 'teachersCache';
+  const cachedEvents = getCache(CACHE_KEY);
+  if (cachedEvents) {
+    return cachedEvents;
+  }
+
   const calendars = await apiCall('/calendars');
+  console.info('calendars', calendars);
   if (get(calendars, 'length') > 0) {
     let calendarsTmp = [];
     calendars.map(el => {
@@ -76,6 +66,10 @@ const getTeachers = async () => {
         color: colors[get(el, 'id')],
       });
     });
+
+    // Update cache
+    setCache(CACHE_KEY, calendarsTmp);
+
     return calendarsTmp;
   }
 }
@@ -106,32 +100,38 @@ const getAppointmentTypes = async () => {
  * Retrieves events from the API and transforms them into a standardized format.
  * @returns {Array} An array of events in the standardized format.
  */
-const getEventsSecond = async () => {
+const getEvents = async () => {
+  const CACHE_KEY = 'eventsCache';
+  const cachedEvents = getCache(CACHE_KEY);
+  if (cachedEvents) {
+    return cachedEvents;
+  }
+
   const classes = await apiCall('/availability/classes');
+  console.info('classes', classes);
   if (get(classes, 'length') > 0) {
     let eventsTmp = [];
-    // let tmp = {};
     classes.map((el, indx) => {
       const date = moment(get(el, 'time'));
-      // let dayTime = 2;
-      // if (date.hour() < 14) {
-      //   dayTime = 1;
-      // }
-      // tmp[get(el, 'appointmentTypeID')] = el;
       eventsTmp.push({
         id: indx,
         title: get(el, 'name'),
         startDate: date.toDate(),
         endDate: date.add(get(el, 'duration', 60), 'minutes').toDate(),
         location: 'Main Room',
-        // dayTime,
         appointmentType: get(el, 'appointmentTypeID'),
         teachers: [get(el, 'calendarID')],
         originalData: el,
       });
     });
+
+    // Update cache
+    setCache(CACHE_KEY, eventsTmp);
+
     return eventsTmp;
   }
-}
 
-export {getTeachers, getEvents, getAppointmentTypes, getEventsSecond};
+  return [];
+};
+
+export {getTeachers, getEventsOld, getAppointmentTypes, getEvents};
