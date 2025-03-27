@@ -2,6 +2,7 @@
   "name": "mindful-calendar",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://jedi2209.github.io/mindful-calendar",
   "dependencies": {
     "@devexpress/dx-react-core": "^4.0.8",
     "@devexpress/dx-react-scheduler": "^4.0.8",
@@ -15,6 +16,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "buffer": "^6.0.3",
+    "gh-pages": "^6.3.0",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "mongodb": "^6.10.0",
@@ -25,6 +27,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "browser": "open -n -a /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome -incognito --args --user-data-dir=\"/tmp/chrome_dev_test\" --disable-web-security --new-window http://localhost:3000",
     "start": "react-scripts start; yarn browser;",
     "build": "react-scripts build",
