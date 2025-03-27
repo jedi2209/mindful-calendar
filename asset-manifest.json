@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/mindful-calendar/static/css/main.aff1af41.css",
+    "main.js": "/mindful-calendar/static/js/main.c3560ea7.js",
+    "index.html": "/mindful-calendar/index.html",
+    "main.aff1af41.css.map": "/mindful-calendar/static/css/main.aff1af41.css.map",
+    "main.c3560ea7.js.map": "/mindful-calendar/static/js/main.c3560ea7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aff1af41.css",
+    "static/js/main.c3560ea7.js"
+  ]
+}
