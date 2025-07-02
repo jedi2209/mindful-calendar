@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import './css/index.css';
 import App from './App';
 
-// Initialize mock utilities for development
+if (process.env.NODE_ENV === 'production') {
+  console.log = console.info = console.warn = console.error = function () {};
+}
 
 const rootElement = document.getElementById('eventCalendar');
 if (!rootElement) {
