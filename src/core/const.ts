@@ -1,4 +1,6 @@
-const colors = {
+import { ColorMap } from '../types';
+
+const colors: ColorMap = {
   52115083: '#C7EAE4',
   52296877: '#A7E8BD',
   52297213: '#FCBCB8',
@@ -17,4 +19,4 @@ const colors = {
   9684621: '#926AEB', // olgastas
 };
 
-export {colors};
+export { colors }; 
