@@ -67,5 +67,35 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
+        retention-days: 1
         name: build-files
-        path: build/ 
+        path: build
+  upload-to-s3:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-files
+        path: ./build
+    
+    - name: Prepare build files for upload
+      run: |
+        ls -la ./build
+    - name: Deploy to Yandex Cloud Object Storage
+      uses: paulvstrashnov/yandex-s3-upload-action@main
+      with:
+        accessKeyId: ${{ secrets.YC_ACCESS_KEY_ID }}
+        secretAccessKey: ${{ secrets.YC_SECRET_ACCESS_KEY }}
+        bucket: ${{ secrets.BUCKET }}
+        localPath: "./build"
+        remotePath: "/"
+        clearBucket: false
