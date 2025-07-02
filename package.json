@@ -2,7 +2,7 @@
   "name": "mindful-calendar",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://jedi2209.github.io/mindful-calendar",
+  "homepage": ".",
   "dependencies": {
     "@devexpress/dx-react-core": "^4.0.8",
     "@devexpress/dx-react-scheduler": "^4.0.8",
