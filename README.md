@@ -1,4 +1,7 @@
-# Getting Started with Create React App
+# Mindful Calendar
+
+[![CI](https://github.com/jedi2209/mindful-calendar/workflows/CI/badge.svg)](https://github.com/jedi2209/mindful-calendar/actions)
+[![Coverage](https://codecov.io/gh/jedi2209/mindful-calendar/branch/main/graph/badge.svg)](https://codecov.io/gh/jedi2209/mindful-calendar)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -88,6 +91,44 @@ Mock data includes:
 - **3 teachers**: Anna, Sarah, and Olga Stas-Belovidova
 - **3 appointment types**: Meditation, Yoga, and Breathing Practices
 - **Dynamic scheduling**: Different schedules for weekdays and weekends
+
+## 🧪 Testing & CI/CD
+
+This project includes comprehensive testing and continuous integration setup.
+
+### Available Test Commands
+
+```bash
+# Run tests in interactive watch mode
+yarn test
+
+# Run tests with coverage report
+yarn test:coverage
+
+# Run tests in CI mode (non-interactive, with coverage)
+yarn test:ci
+```
+
+### Test Structure
+
+- **Unit Tests**: Component testing using React Testing Library
+- **API Tests**: Mock API functionality testing
+- **Coverage Reports**: Automatic test coverage generation
+
+### Continuous Integration
+
+The project uses GitHub Actions for automated testing:
+
+- **Triggers**: Runs on push to `main`/`develop` branches and pull requests to `main`
+- **Node.js Versions**: Tests on Node.js 18.x and 20.x
+- **Coverage**: Automatically generates and uploads coverage reports
+- **Build Verification**: Ensures the project builds successfully
+
+### Local Testing Best Practices
+
+1. Run `yarn test:coverage` before committing to ensure adequate test coverage
+2. Write tests for new components and API functions
+3. Use the mock data system for consistent test results
 
 ## Learn More
 
