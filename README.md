@@ -39,6 +39,56 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
+## 🔧 Mock Data for Development
+
+This project includes comprehensive mock data functionality for local development and testing without needing to connect to the real API.
+
+### Automatic Mock Mode
+
+By default, the application runs in mock mode when:
+
+- `NODE_ENV=development` (automatically enabled with `yarn start`)
+- `REACT_APP_USE_MOCK_DATA=true` is set in environment variables
+
+### Mock Data Features
+
+- **Realistic Data**: Mock data includes classes for the next 7 days with varied schedules
+- **Network Simulation**: API calls include realistic delays (300-1000ms)
+- **Complete Coverage**: All API endpoints are mocked:
+  - `/availability/classes` - Yoga and meditation classes
+  - `/calendars` - Teacher information
+  - `/appointment-types` - Class types and scheduling
+
+### Development Tools
+
+In development mode, the following utilities are available in the browser console:
+
+```javascript
+// Check current API mode
+window.getMockStatus()
+
+// Toggle between mock and live API (requires page refresh)
+window.toggleMockMode()
+```
+
+### Environment Configuration
+
+Create a `.env` file in the project root to control mock mode:
+
+```env
+# Enable mock data (optional, defaults to true in development)
+REACT_APP_USE_MOCK_DATA=true
+```
+
+### Mock Data Structure
+
+Mock data includes:
+
+- **8 different class types**: Morning Meditation, Hatha Yoga for Beginners, Vinyasa Flow, Evening Meditation, Pranayama, Power Yoga, Yoga Nidra, and Yin Yoga
+- **3 teachers**: Anna, Sarah, and Olga Stas-Belovidova
+- **3 appointment types**: Meditation, Yoga, and Breathing Practices
+- **Dynamic scheduling**: Different schedules for weekdays and weekends
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
