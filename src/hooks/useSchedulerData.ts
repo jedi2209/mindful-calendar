@@ -4,7 +4,6 @@ import { get } from 'lodash';
 import { getTeachers, getAppointmentTypes, getEvents } from '../Events';
 import { AppointmentType } from '../types';
 import { ExtendedEvent, Resource } from '../types/scheduler';
-import { checkObjectKey } from '../core/utils';
 import { SCHEDULER_CONFIG } from '../core/scheduler-constants';
 
 export const useSchedulerData = () => {
