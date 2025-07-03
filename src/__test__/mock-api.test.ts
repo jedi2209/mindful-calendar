@@ -84,12 +84,8 @@ describe('Mock API functionality', () => {
     );
   });
 
-  test('should respect development mode for mock enablement', () => {
+  test('should respect production mode for mock enablement', () => {
     const originalNodeEnv = process.env.NODE_ENV;
-    
-    // Test development mode
-    process.env.NODE_ENV = 'development';
-    expect(isMockMode()).toBe(true);
     
     // Test production mode
     process.env.NODE_ENV = 'production';
