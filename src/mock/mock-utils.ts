@@ -7,8 +7,7 @@
  * @returns true if mock mode is enabled
  */
 export const isMockMode = (): boolean => {
-  return process.env.REACT_APP_USE_MOCK_DATA === 'true' || 
-         process.env.NODE_ENV === 'development';
+  return process.env.REACT_APP_USE_MOCK_DATA === 'true';
 };
 
 /**
@@ -48,7 +47,7 @@ export const getApiModeStatus = (): string => {
  * Development helper: Toggle mock mode in browser console
  * Usage in console: window.toggleMockMode()
  */
-if (process.env.NODE_ENV === 'development') {
+if (isMockMode()) {
   (window as any).toggleMockMode = () => {
     const currentMode = isProgrammaticMockMode();
     if (currentMode) {

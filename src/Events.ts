@@ -75,7 +75,9 @@ const getTeachers = async (): Promise<Teacher[]> => {
     });
 
     // Update cache
-    setCache(CACHE_KEY, calendarsTmp);
+    if (process.env.NODE_ENV === 'production') {
+      setCache(CACHE_KEY, calendarsTmp);
+    }
 
     return calendarsTmp;
   }
@@ -135,7 +137,9 @@ const getEvents = async (): Promise<Event[]> => {
     });
 
     // Update cache
-    setCache(CACHE_KEY, eventsTmp);
+    if (process.env.NODE_ENV != 'development') {
+      setCache(CACHE_KEY, eventsTmp);
+    }
 
     return eventsTmp;
   }

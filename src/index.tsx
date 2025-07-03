@@ -15,7 +15,11 @@ if (!rootElement) {
 const root = createRoot(rootElement as any);
 
 root.render(
-  <StrictMode>
+  process.env.NODE_ENV === 'production' ? (
+    <StrictMode>
+      <App />
+    </StrictMode>
+  ) : (
     <App />
-  </StrictMode>
+  )
 ); 

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import moment from 'moment';
 import { get } from 'lodash';
 import { getTeachers, getAppointmentTypes, getEvents } from '../Events';
@@ -14,17 +14,26 @@ export const useSchedulerData = () => {
   const [lastHour, setLastHour] = useState<number>(SCHEDULER_CONFIG.DEFAULT_END_HOUR);
   const [loadingText, setLoadingText] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState<Date>(moment().toDate());
+  
+  // Track loading state to prevent multiple concurrent API calls
+  const isLoadingRef = useRef<boolean>(false);
+  const hasLoadedRef = useRef<boolean>(false);
 
   const eventsLoading = useCallback(async (): Promise<void> => {
+    // Prevent multiple concurrent API calls
+    if (isLoadingRef.current) {
+      return;
+    }
+    
+    isLoadingRef.current = true;
     setLoadingText('loading events...');
-    const fetchedEvents = await getEvents();
     
-    let currentResources = [...resources];
-    const teachersInited = checkObjectKey(currentResources, 'teachers');
-    const appointmentTypesInited = checkObjectKey(currentResources, 'appointmentType');
-    let appointmentTypesTmp: AppointmentType[] | null = null;
-    
-    if (!get(appointmentTypesInited, 'length')) {
+    try {
+      const fetchedEvents = await getEvents();
+      
+      let currentResources: Resource[] = [];
+      let appointmentTypesTmp: AppointmentType[] | null = null;
+      
       setLoadingText('loading appointments...');
       appointmentTypesTmp = await getAppointmentTypes();
       currentResources.push({
@@ -33,9 +42,7 @@ export const useSchedulerData = () => {
         instances: appointmentTypesTmp,
         allowMultiple: false,
       });
-    }
-    
-    if (!get(teachersInited, 'length')) {
+      
       setLoadingText('loading teachers...');
       const teachers = await getTeachers();
       currentResources.push({
@@ -44,52 +51,60 @@ export const useSchedulerData = () => {
         instances: teachers,
         allowMultiple: true,
       });
-    }
-    
-    setResources(currentResources);
-    
-    const nearestDateNext = moment(get(fetchedEvents, '0.startDate')).isAfter(moment(), 'days');
-    
-    if (fetchedEvents && appointmentTypesTmp) {
-      let hourFirst = startHour;
-      let hourLast = lastHour;
       
-      const extendedEvents: ExtendedEvent[] = fetchedEvents.map((el) => {
-        const eventStartHour = parseInt(moment(el.startDate).format('H'));
-        if (eventStartHour < hourFirst) {
-          hourFirst = eventStartHour;
+      setResources(currentResources);
+      
+      const nearestDateNext = moment(get(fetchedEvents, '0.startDate')).isAfter(moment(), 'days');
+      
+      if (fetchedEvents && appointmentTypesTmp) {
+        let hourFirst = startHour;
+        let hourLast = lastHour;
+        
+        const extendedEvents: ExtendedEvent[] = fetchedEvents.map((el) => {
+          const eventStartHour = parseInt(moment(el.startDate).format('H'));
+          if (eventStartHour < hourFirst) {
+            hourFirst = eventStartHour;
+          }
+          if (eventStartHour > hourLast) {
+            hourLast = eventStartHour;
+          }
+          const appointmentDataTmp = appointmentTypesTmp!.find(es => es.id === el.appointmentType);
+          return {
+            ...el,
+            appointmentData: appointmentDataTmp,
+          };
+        });
+        
+        // Only update hours if they actually changed
+        if (hourFirst !== startHour) {
+          setStartHour(hourFirst);
         }
-        if (eventStartHour > hourLast) {
-          hourLast = eventStartHour;
+        if (hourLast !== lastHour) {
+          setLastHour(hourLast);
         }
-        const appointmentDataTmp = appointmentTypesTmp!.find(es => es.id === el.appointmentType);
-        return {
-          ...el,
-          appointmentData: appointmentDataTmp,
-        };
-      });
-      
-      if (hourFirst !== startHour) {
-        setStartHour(hourFirst);
-      }
-      if (hourLast !== lastHour) {
-        setLastHour(hourLast);
+        
+        setEvents(extendedEvents);
+        setLoadingText(null);
+        hasLoadedRef.current = true;
       }
       
-      setEvents(extendedEvents);
+      if (nearestDateNext) {
+        setCurrentDate(moment(get(fetchedEvents, '0.startDate')).toDate());
+      }
+    } catch (error) {
+      console.error('Error loading scheduler data:', error);
       setLoadingText(null);
+    } finally {
+      isLoadingRef.current = false;
     }
-    
-    if (nearestDateNext) {
-      setCurrentDate(moment(get(fetchedEvents, '0.startDate')).toDate());
-    }
-  }, [startHour, lastHour, resources]);
+  }, []); // Remove all dependencies to prevent re-creation
 
   useEffect(() => {
-    if (!get(events, 'length')) {
+    // Only load if we haven't loaded yet and not currently loading
+    if (!hasLoadedRef.current && !isLoadingRef.current) {
       eventsLoading();
     }
-  }, [events, eventsLoading]);
+  }, []); // Empty dependency array - only run once on mount
 
   return {
     events,
