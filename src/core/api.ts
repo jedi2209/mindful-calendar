@@ -27,7 +27,7 @@ const apiCall = async <T = any>(url: string): Promise<T> => {
   
   // Original API call logic
   console.info(`🌐 Live API call: ${url}`);
-  const host = process.env.REACT_APP_API_HOST || 'https://localhost:3001';
+  const host = process.env.REACT_APP_API_HOST ?? 'https://localhost:3001';
   
   try {
     const response = await fetch(host + url, {

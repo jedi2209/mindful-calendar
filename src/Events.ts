@@ -137,7 +137,7 @@ const getEvents = async (): Promise<Event[]> => {
     });
 
     // Update cache
-    if (process.env.NODE_ENV != 'development') {
+    if (process.env.NODE_ENV !== 'development') {
       setCache(CACHE_KEY, eventsTmp);
     }
 

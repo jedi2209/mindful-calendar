@@ -56,8 +56,8 @@ export const useSchedulerData = () => {
       const nearestDateNext = moment(get(fetchedEvents, '0.startDate')).isAfter(moment(), 'days');
       
       if (fetchedEvents && appointmentTypesTmp) {
-        let hourFirst = startHour;
-        let hourLast = lastHour;
+        let hourFirst = 9;
+        let hourLast = 21;
         
         const extendedEvents: ExtendedEvent[] = fetchedEvents.map((el) => {
           const eventStartHour = parseInt(moment(el.startDate).format('H'));
@@ -74,13 +74,9 @@ export const useSchedulerData = () => {
           };
         });
         
-        // Only update hours if they actually changed
-        if (hourFirst !== startHour) {
-          setStartHour(hourFirst);
-        }
-        if (hourLast !== lastHour) {
-          setLastHour(hourLast);
-        }
+        // Update hours if they changed from defaults
+        setStartHour(hourFirst);
+        setLastHour(hourLast);
         
         setEvents(extendedEvents);
         setLoadingText(null);
@@ -103,7 +99,7 @@ export const useSchedulerData = () => {
     if (!hasLoadedRef.current && !isLoadingRef.current) {
       eventsLoading();
     }
-  }, []); // Empty dependency array - only run once on mount
+  }, [eventsLoading]); // Include eventsLoading in dependency array
 
   return {
     events,
